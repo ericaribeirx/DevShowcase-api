@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -18,11 +18,13 @@ model Profile {
 }
 
 model Project {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  url         String
-  createdAt   DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String?
+  url           String
+  createdAt     DateTime @default(now())
+  averageRating Float    @default(0)
+  upvotes       Int      @default(0)
 
   profileId   Int
   profile     Profile  @relation(fields: [profileId], references: [id])

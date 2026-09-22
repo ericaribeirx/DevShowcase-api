@@ -1,0 +1,291 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "DevShowcase API",
+    "version": "1.0.0",
+    "description": "API para publicação de perfis, projetos, tecnologias e feedbacks de portfólio."
+  },
+  "servers": [
+    { "url": "/", "description": "Servidor atual" }
+  ],
+  "tags": [
+    { "name": "Profiles" },
+    { "name": "Technologies" },
+    { "name": "Projects" },
+    { "name": "Feedbacks" }
+  ],
+  "paths": {
+    "/api/profiles": {
+      "post": {
+        "tags": ["Profiles"],
+        "summary": "Criar perfil",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProfileInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Perfil criado",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Profile" } } }
+          },
+          "400": { "description": "Erro de validação", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationErrorResponse" } } } }
+        }
+      }
+    },
+    "/api/profiles/{id}": {
+      "get": {
+        "tags": ["Profiles"],
+        "summary": "Buscar perfil por id",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfil encontrado",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Profile" } } }
+          },
+          "404": { "description": "Perfil não encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/api/technologies": {
+      "post": {
+        "tags": ["Technologies"],
+        "summary": "Criar tecnologia",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TechnologyInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tecnologia criada",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Technology" } } }
+          },
+          "400": { "description": "Erro de validação", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationErrorResponse" } } } }
+        }
+      },
+      "get": {
+        "tags": ["Technologies"],
+        "summary": "Listar tecnologias",
+        "responses": {
+          "200": {
+            "description": "Lista de tecnologias",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Technology" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects": {
+      "post": {
+        "tags": ["Projects"],
+        "summary": "Criar projeto",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProjectInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Projeto criado",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Project" } } }
+          },
+          "400": { "description": "Erro de validação", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationErrorResponse" } } } }
+        }
+      },
+      "get": {
+        "tags": ["Projects"],
+        "summary": "Listar projetos com filtro por tecnologia e paginação",
+        "parameters": [
+          { "name": "technology", "in": "query", "description": "Nome da tecnologia para filtrar", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "description": "Número da página (padrão 1)", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "description": "Itens por página (padrão 10, máx. 100)", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de projetos",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedProjects" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{id}/feedbacks": {
+      "post": {
+        "tags": ["Feedbacks"],
+        "summary": "Cadastrar feedback (nota de 1 a 5 e comentário) e recalcular a média do projeto",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/FeedbackInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Feedback criado e média do projeto atualizada",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Feedback" } } }
+          },
+          "400": { "description": "Erro de validação", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationErrorResponse" } } } },
+          "404": { "description": "Projeto não encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/api/projects/{id}/upvote": {
+      "put": {
+        "tags": ["Projects"],
+        "summary": "Incrementar as curtidas/estrelas do projeto",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Projeto com upvotes atualizados",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Project" } } }
+          },
+          "404": { "description": "Projeto não encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProfileInput": {
+        "type": "object",
+        "required": ["name", "email"],
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "bio": { "type": "string" }
+        }
+      },
+      "Profile": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "bio": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "TechnologyInput": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" }
+        }
+      },
+      "Technology": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" }
+        }
+      },
+      "ProjectInput": {
+        "type": "object",
+        "required": ["title", "url", "profileId", "technologyIds"],
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "url": { "type": "string" },
+          "profileId": { "type": "integer" },
+          "technologyIds": { "type": "array", "items": { "type": "integer" } }
+        }
+      },
+      "Project": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
+          "url": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "averageRating": { "type": "number" },
+          "upvotes": { "type": "integer" },
+          "profileId": { "type": "integer" },
+          "profile": { "$ref": "#/components/schemas/Profile" },
+          "technologies": { "type": "array", "items": { "$ref": "#/components/schemas/Technology" } },
+          "feedbacks": { "type": "array", "items": { "$ref": "#/components/schemas/Feedback" } }
+        }
+      },
+      "PaginatedProjects": {
+        "type": "object",
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Project" } },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "page": { "type": "integer" },
+              "limit": { "type": "integer" },
+              "total": { "type": "integer" },
+              "totalPages": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "FeedbackInput": {
+        "type": "object",
+        "required": ["author", "comment", "rating"],
+        "properties": {
+          "author": { "type": "string" },
+          "comment": { "type": "string" },
+          "rating": { "type": "integer", "minimum": 1, "maximum": 5 }
+        }
+      },
+      "Feedback": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "author": { "type": "string" },
+          "comment": { "type": "string" },
+          "rating": { "type": "integer" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "projectId": { "type": "integer" },
+          "project": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "averageRating": { "type": "number" },
+              "feedbacksCount": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "erro": { "type": "string" }
+        }
+      },
+      "ValidationErrorResponse": {
+        "type": "object",
+        "properties": {
+          "erros": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

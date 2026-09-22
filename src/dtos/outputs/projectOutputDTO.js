@@ -5,9 +5,12 @@ function projectOutputDTO(project) {
     description: project.description,
     url: project.url,
     createdAt: project.createdAt,
+    averageRating: project.averageRating,
+    upvotes: project.upvotes,
     profileId: project.profileId,
     profile: project.profile,
-    technologies: project.technologies
+    technologies: project.technologies,
+    feedbacks: project.feedbacks
   };
 }
 

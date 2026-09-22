@@ -9,37 +9,32 @@ const {
   findAllTechnologies
 } = require("../repositories/technologyRepository");
 
+const { ValidationError } = require("../errors/AppError");
+
 const router = express.Router();
 
-router.post("/", async (req, res) => {
-  const errors = validateTechnology(req.body);
-
-  if (errors.length > 0) {
-    return res.status(400).json({
-      erros: errors
-    });
-  }
-
+router.post("/", async (req, res, next) => {
   try {
+    const errors = validateTechnology(req.body);
+
+    if (errors.length > 0) {
+      throw new ValidationError(errors);
+    }
+
     const technology = await createTechnology(req.body);
     res.status(201).json(technologyOutputDTO(technology));
-
   } catch (error) {
-    res.status(500).json({
-      erro: "Erro ao criar tecnologia"
-    });
+    next(error);
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   try {
     const technologies = await findAllTechnologies();
 
     res.json(technologies.map(technologyOutputDTO));
   } catch (error) {
-    res.status(500).json({
-      erro: "Erro ao buscar tecnologias"
-    });
+    next(error);
   }
 });
 
